@@ -2,6 +2,18 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
+const CARE_PLAN_EXTENSION_URL =
+  "http://chis.local/fhir/StructureDefinition/patient-care-plan";
+
+const CARE_PLAN_OPTIONS = [
+  "Immunization",
+  "Nutrition",
+  "Maternal Care",
+  "TB",
+  "HIV",
+  "WASH",
+];
+
 function EditPatientPage() {
   const { patientId } = useParams();
   const navigate = useNavigate();
@@ -18,6 +30,7 @@ function EditPatientPage() {
     province: "",
     postalCode: "",
     country: "Philippines",
+    carePlans: [],
   });
 
   useEffect(() => {
@@ -27,6 +40,11 @@ function EditPatientPage() {
       );
 
       const patient = response.data;
+
+      const carePlans =
+        patient.extension
+          ?.filter((ext) => ext.url === CARE_PLAN_EXTENSION_URL)
+          ?.map((ext) => ext.valueString) || [];
 
       setForm({
         givenName: patient.name?.[0]?.given?.[0] || "",
@@ -40,6 +58,7 @@ function EditPatientPage() {
         province: patient.address?.[0]?.state || "",
         postalCode: patient.address?.[0]?.postalCode || "",
         country: patient.address?.[0]?.country || "Philippines",
+        carePlans,
       });
     };
 
@@ -50,13 +69,29 @@ function EditPatientPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleCarePlanChange = (e) => {
+    const { value, checked } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      carePlans: checked
+        ? [...prev.carePlans, value]
+        : prev.carePlans.filter((plan) => plan !== value),
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await axios.put(`http://localhost:5000/patients/${patientId}`, form);
+    try {
+      await axios.put(`http://localhost:5000/patients/${patientId}`, form);
 
-    alert("Patient updated successfully");
-    navigate(`/patients/${patientId}`);
+      alert("Patient updated successfully");
+      navigate(`/patients/${patientId}`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update patient");
+    }
   };
 
   return (
@@ -196,7 +231,33 @@ function EditPatientPage() {
             </div>
           </div>
 
-          <button type="submit">Save Changes</button>
+          <div className="section">
+            <h3>Patient Care Plans</h3>
+
+            <div className="checkbox-grid">
+              {CARE_PLAN_OPTIONS.map((plan) => (
+                <label className="checkbox-card" key={plan}>
+                  <input
+                    type="checkbox"
+                    value={plan}
+                    checked={form.carePlans.includes(plan)}
+                    onChange={handleCarePlanChange}
+                  />
+                  <span>{plan}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="workflow-buttons">
+            <button type="submit">Save Changes</button>
+            <button
+              type="button"
+              onClick={() => navigate(`/patients/${patientId}`)}
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </section>
     </>

@@ -12,7 +12,7 @@ function PatientDetailsPage() {
   useEffect(() => {
     const fetchPatient = async () => {
       const response = await axios.get(
-        `http://localhost:5000/patients/${patientId}`
+        `http://localhost:5000/patients/${patientId}`,
       );
 
       setPatient(response.data);
@@ -28,6 +28,15 @@ function PatientDetailsPage() {
   const patientName = `${patient.name?.[0]?.given?.join(" ") || ""} ${
     patient.name?.[0]?.family || ""
   }`.trim();
+
+  const carePlans =
+    patient.extension
+      ?.filter(
+        (ext) =>
+          ext.url ===
+          "http://chis.local/fhir/StructureDefinition/patient-care-plan",
+      )
+      ?.map((ext) => ext.valueString) || [];
 
   return (
     <>
@@ -51,9 +60,7 @@ function PatientDetailsPage() {
                 Edit Patient
               </button>
 
-              <button>
-                Delete Patient
-              </button>
+              <button>Delete Patient</button>
 
               <button
                 onClick={() =>
@@ -84,18 +91,28 @@ function PatientDetailsPage() {
       </section>
 
       <section className="card">
-        <h2>Patient Workflows</h2>
+        <h2>Patient Care Plans</h2>
 
-        <div className="workflow-buttons">
-          <button
-            onClick={() => navigate(`/patients/${patientId}/immunizations`)}
-          >
-            Immunizations
-          </button>
-
-          <button disabled>Nutrition</button>
-          <button disabled>Maternity Care</button>
-        </div>
+        {carePlans.length === 0 ? (
+          <p>No care plans selected for this patient.</p>
+        ) : (
+          <div className="workflow-buttons">
+            {carePlans.map((plan) => (
+              <button
+                key={plan}
+                onClick={() => {
+                  if (plan === "Immunization") {
+                    navigate(`/patients/${patientId}/immunizations`);
+                  } else {
+                    alert(`${plan} page is coming later`);
+                  }
+                }}
+              >
+                {plan}
+              </button>
+            ))}
+          </div>
+        )}
       </section>
     </>
   );

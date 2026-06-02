@@ -283,6 +283,40 @@ button:disabled {
   flex-wrap: wrap;
 }
 
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.checkbox-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  padding: 12px 14px;
+  background: white;
+  cursor: pointer;
+}
+
+.checkbox-card:hover {
+  background: #f0fdfa;
+  border-color: var(--primary);
+}
+
+.checkbox-card input {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 900px) {
+  .checkbox-grid {
+    grid-template-columns: 1fr;
+  }
+}
 /* Responsive */
 
 @media (max-width: 900px) {
@@ -304,4 +338,46 @@ button:disabled {
     width: 100%;
     padding: 16px;
   }
+
+  .small-btn {
+  margin-top: 0;
+  margin-right: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.danger-btn {
+  background: #dc2626;
+}
+
+.danger-btn:hover {
+  background: #b91c1c;
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+.action-link {
+  color: #0f766e;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.action-link:hover {
+  text-decoration: underline;
+}
+
+.delete-link {
+  color: #dc2626;
+}
+
+.delete-link:hover {
+  text-decoration: underline;
+}
+
+.action-separator {
+  margin: 0 8px;
+  color: #9ca3af;
+}
 }

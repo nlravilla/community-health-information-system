@@ -17,6 +17,7 @@ function PatientForm() {
     province: "",
     postalCode: "",
     country: "Philippines",
+    carePlans: [],
   });
 
   const handleChange = (e) => {
@@ -39,24 +40,36 @@ function PatientForm() {
       province: "",
       postalCode: "",
       country: "Philippines",
+      carePlans: [],
     });
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      await axios.post("http://localhost:5000/patients", form);
+  // 🚀 Add this line to see the payload before it leaves the browser
+  console.log("✈️ FRONTEND SENDING TO BACKEND:", form);
 
-      alert("Patient created successfully");
+  try {
+    const response = await axios.post("http://localhost:5000/patients", form);
+    alert("Patient created successfully");
+    resetForm();
+    navigate("/patients");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to create patient");
+  }
+};
 
-      resetForm();
+  const handleCarePlanChange = (e) => {
+    const { value, checked } = e.target;
 
-      navigate("/patients");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to create patient");
-    }
+    setForm((prev) => ({
+      ...prev,
+      carePlans: checked
+        ? [...prev.carePlans, value]
+        : prev.carePlans.filter((plan) => plan !== value),
+    }));
   };
 
   return (
@@ -104,7 +117,7 @@ function PatientForm() {
 
           <div className="grid two">
             <div className="field">
-              <label>Sex</label>
+              <label>Gender</label>
               <select
                 name="gender"
                 value={form.gender}
@@ -138,11 +151,7 @@ function PatientForm() {
           <div className="grid three">
             <div className="field">
               <label>Phone Number</label>
-              <input
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-              />
+              <input name="phone" value={form.phone} onChange={handleChange} />
             </div>
 
             <div className="field">
@@ -156,11 +165,7 @@ function PatientForm() {
 
             <div className="field">
               <label>City</label>
-              <input
-                name="city"
-                value={form.city}
-                onChange={handleChange}
-              />
+              <input name="city" value={form.city} onChange={handleChange} />
             </div>
 
             <div className="field">
@@ -191,10 +196,31 @@ function PatientForm() {
             </div>
           </div>
         </div>
+        <div className="section">
+          <h3>Patient Care Plans</h3>
 
-        <button type="submit">
-          Register Patient
-        </button>
+          <div className="checkbox-grid">
+            {[
+              "Immunization",
+              "Nutrition",
+              "Maternal Care",
+              "TB",
+              "HIV",
+              "WASH",
+            ].map((plan) => (
+              <label className="checkbox-card" key={plan}>
+                <input
+                  type="checkbox"
+                  value={plan}
+                  checked={form.carePlans.includes(plan)}
+                  onChange={handleCarePlanChange}
+                />
+                <span>{plan}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        <button type="submit">Register Patient</button>
       </form>
     </section>
   );
