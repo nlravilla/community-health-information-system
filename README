@@ -1,0 +1,13 @@
+Prerequisite:
+- Install Docker Desktop
+
+Steps:
+1. git clone https://github.com/nlravilla/community-health-information-system.git
+2. cd community-health-information-system
+3. docker compose up
+
+Application:
+http://localhost:5173
+
+FHIR Server:
+http://localhost:8080/fhir
