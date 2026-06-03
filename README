@@ -1,7 +1,7 @@
 Prerequisite:
 - Install Docker Desktop
 
-Steps:
+Steps to start application:
 1. git clone https://github.com/nlravilla/community-health-information-system.git
 2. cd community-health-information-system
 3. docker compose up
